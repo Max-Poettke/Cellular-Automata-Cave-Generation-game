@@ -25,20 +25,38 @@
 
             window.addEventListener("keydown", function(event){
                 console.log(event.which);
-                if (event.which === 71){
-                    cellMap = greenery(cellMap);
-                } else if (event.which === 72){
-                    cellMap = revert(cellMap);
-                } else if (event.which === 67){
-                    cellMap = makeMap();
-                }else{
-                cellMap = doSimulationStep(cellMap);
-                }
-                drawMap(cellMap);
-            })
-
+				if (!gameStateInitiated){
+					if (event.which === 71){
+						cellMap = greenery(cellMap);
+					} else if (event.which === 72){
+						cellMap = revert(cellMap);
+					} else if (event.which === 13){
+						gameStateInitiated = true;
+						console.log("hello");
+						mapPixelData = context.getImageData(0,0,canvas.width,canvas.height);
+						context.putImageData(mapPixelData, 0,0);
+					} else if (event.which === 67){
+						cellMap = makeMap();
+					}else{
+					cellMap = doSimulationStep(cellMap);
+					}
+					drawMap(cellMap);
+				}
+			})
+			
+			window.addEventListener("click", function(event){
+				if (gameStateInitiated){
+				playerPosX = event.x;
+				playerPosY = event.y;
+				}
+			})
+			
+			var gameStateInitiated = false;
+			var mapPixelData;
+			var playerPosX = 0;
+			var playerPosY = 0;
             var windowWHRatio = window.innerHeight / window.innerWidth;
-            var width = 300;
+            var width = 200;
             var height =  Math.floor(width * windowWHRatio);
             var cellMap = [];
             const cellWidth = window.innerWidth / width;
@@ -62,14 +80,13 @@
 
             function drawMap(arr){
                 context.strokeStyle = "black";
+				context.fillStyle = "black";
+				context.fillRect(0,0,canvas.width,canvas.height);
                 for (let i = 0; i < arr.length; i++){
                     if(arr[i].state === 0){
-                        context.fillStyle = "black";
-                    } else if (arr[i].state === 1){
-                        context.fillStyle = "blue";
-                    } else {
-                        context.fillStyle = "yellow";
-                    }
+						continue;
+                    } 
+                        context.fillStyle = ["orange","green"][(arr[i].state - 1)]; 
                     context.fillRect(arr[i].x*cellWidth, arr[i].y*cellWidth, cellWidth, cellWidth);
                     context.strokeRect(arr[i].x*cellWidth, arr[i].y*cellWidth, cellWidth, cellWidth);
                 }
@@ -130,6 +147,12 @@
                 }
                 return newMap;
             }
+			
+			function mainGameLoop(){
+				setTimeout(function(){
+					mainGameLoop();
+				},20)
+			}
 
         </script>
     </head>
